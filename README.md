@@ -20,7 +20,7 @@ Deep learning models for 1D time-series data (like PPG, ECG, or radar phase sign
 *(Currently installable via source, PyPI coming soon)*
 
 ```bash
-git clone [https://github.com/yourusername/physioaugment.git](https://github.com/yourusername/physioaugment.git)
+git clone [https://github.com/phish-tech/PhysioAugment.git](https://github.com/phish-tech/PhysioAugment)(https://github.com/phish-tech/PhysioAugment.git)
 cd physioaugment
 pip install -e .
 
