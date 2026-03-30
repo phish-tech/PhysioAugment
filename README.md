@@ -1,45 +1,81 @@
-# PhysioAugment 🫀📈
+# PhysioAugment
 
 [English](README.md) | [简体中文](README_zh-CN.md)
 
-**A Lightweight, Plug-and-Play 1D Physiological Signal Augmentation Library for Deep Learning.**
+[![Python >= 3.7](https://img.shields.io/badge/Python->=3.7-blue.svg)](https://www.python.org/)
+[![NumPy](https://img.shields.io/badge/NumPy-Required-orange.svg)](https://numpy.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.6+](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/)
+**PhysioAugment** is a lightweight, pure-NumPy data augmentation library tailored for 1D physiological signals (e.g., PPG, ECG, respiration signals).
 
-Deep learning models for 1D time-series data (like PPG, ECG, or radar phase signals) often suffer from overfitting due to the lack of diverse training data. Unlike images, you cannot simply "crop" or "rotate" a heartbeat signal without destroying its frequency and phase characteristics.
+High-quality data augmentation is crucial for improving model robustness in deep learning. While the computer vision domain has abundant toolkits, lightweight augmentation tools specifically for 1D physiological signals are relatively scarce. PhysioAugment aims to fill this gap by providing a plug-and-play, highly customizable augmentation pipeline.
 
-**PhysioAugment** solves this by providing domain-specific, biophysically meaningful data augmentations using pure NumPy. 
+## ✨ Core Features
 
-## ✨ Key Features
-* **Zero Bloat:** Pure Python with only `numpy` and `scipy` dependencies.
-* **Plug-and-Play:** API designed to perfectly mimic `torchvision.transforms` and `albumentations`.
-* **Domain-Specific:** Simulates real-world sensor noise, including baseline wander, respiration interference, and motion artifacts.
+* **Pure NumPy Implementation**: Extremely lightweight, requiring no heavy deep learning frameworks to run.
+* **Realistic Scenarios**: Built-in noise and interference models that mimic real-world physiological signal artifacts (e.g., baseline wander, respiration interference, motion artifacts).
+* **Deep Learning Oriented**: Features a PyTorch-like `transforms.Compose` API, allowing seamless integration into existing Dataloaders and training pipelines.
+* **Probabilistic Control**: Supports setting trigger probabilities (`p`) for each augmentation operation to easily construct diverse training batches.
+
+## 📦 Installation
+
+You can install the latest version directly from GitHub using pip:
+
+```bash
+pip install git+[https://github.com/phish-tech/PhysioAugment.git](https://github.com/phish-tech/PhysioAugment.git)
+```
+
+Alternatively, clone the repository for local development (editable mode recommended):
+
+```bash
+git clone [https://github.com/phish-tech/PhysioAugment.git](https://github.com/phish-tech/PhysioAugment.git)
+cd PhysioAugment
+pip install -e .
+```
 
 ## 🚀 Quick Start
 
-### Installation
-*(Currently installable via source, PyPI coming soon)*
+PhysioAugment's API design is highly intuitive. You can use `Compose` to chain multiple augmentation operations together:
 
-```bash
-git clone [https://github.com/phish-tech/PhysioAugment.git](https://github.com/phish-tech/PhysioAugment)(https://github.com/phish-tech/PhysioAugment.git)
-cd physioaugment
-pip install -e .
+```python
+import numpy as np
+from core import Compose, AddMotionArtifact
+from baseline import AddBaselineWander, AddRespirationInterference
 
-📊 Visual Demo
-Here is what PhysioAugment does to a clean physiological signal under the hood:
+# 1. Initialize the data augmentation pipeline
+augment_pipeline = Compose([
+    AddBaselineWander(fs=100, amp_ratio=0.3, p=0.8),          # Add baseline wander (80% probability)
+    AddRespirationInterference(fs=100, amp_ratio=0.2, p=0.5), # Add respiration interference (50% probability)
+    AddMotionArtifact(fs=100, artifact_ratio=1.5, p=0.3)      # Add motion artifacts (30% probability)
+])
 
-💡 Perfect For
-Fatigue Monitoring Systems: Augmenting datasets for multi-class fatigue state classification (e.g., using keystroke dynamics or physiological baselines).
+# 2. Prepare your 1D signal data (e.g., a PPG signal of length 1000)
+# x = np.load('your_signal.npy')
+x = np.sin(2 * np.pi * 1.5 * np.arange(1000) / 100) # Simulated signal
 
-Multi-Modal Vitals: Enhancing dual-modality blood pressure estimation models (e.g., combining iPPG and mmWave radar RMS).
+# 3. Apply data augmentation
+augmented_x = augment_pipeline(x)
+```
 
-Wearable AIoT: Simulating intense motion artifacts for robust continuous monitoring algorithms and adversarial living research.
+## 🛠️ Supported Augmentations
 
-Neural Interfaces: Injecting low-frequency baseline drifts into contact/non-contact physiological interface data (like metasurface sensor arrays).
+The current version includes the following core augmentation modules (more modules are continuously being updated):
 
-🤝 Contributing
-Contributions are welcome! If you have ideas for new physiological noise simulations (e.g., 50/60Hz powerline interference, sensor disconnect flats), feel free to open an issue or submit a Pull Request.
+### 1. `AddBaselineWander`
+Simulates low-frequency baseline wander caused by sensor displacement or temperature changes.
+* **`fs`**: Sampling frequency
+* **`amp_ratio`**: Ratio of the wander amplitude relative to the original signal
+* **`freq_range`**: Frequency range of the wander (default: 0.05Hz - 0.3Hz)
 
-📄 License
-This project is licensed under the MIT License - see the LICENSE file for details.
+### 2. `AddRespirationInterference`
+Simulates the inevitable respiration modulation effects in physiological signals.
+* **`resp_freq_range`**: Typical respiration frequency range (default: 0.2Hz - 0.4Hz)
+
+### 3. `AddMotionArtifact`
+Simulates burst, high-amplitude noise generated by intense user movement.
+* **`artifact_ratio`**: Intensity of the artifact
+* **`num_artifacts`**: Range for the number of generated artifacts
+
+## 📄 License
+
+This project is open-sourced under the [MIT License](LICENSE). You are welcome to use it freely in your research or projects. If you find this library helpful, please consider giving it a ⭐️ Star!
