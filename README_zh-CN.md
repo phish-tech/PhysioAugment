@@ -66,6 +66,8 @@ augmented_x = augment_pipeline(x)
 * **`fs`**: 采样率
 * **`amp_ratio`**: 漂移幅度相对于原信号的比例
 * **`freq_range`**: 漂移频率的范围 (默认 0.05Hz - 0.3Hz)
+* <img width="1901" height="309" alt="image" src="https://github.com/user-attachments/assets/a31926a1-b332-46d8-924a-ed4711c149b1" />
+
 
 ### 2. `AddRespirationInterference` (呼吸干扰)
 模拟生理信号中不可避免的呼吸调制效应。
