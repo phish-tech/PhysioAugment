@@ -65,7 +65,9 @@ The current version includes the following core augmentation modules (more modul
 Simulates low-frequency baseline wander caused by sensor displacement or temperature changes.
 * **`fs`**: Sampling frequency
 * **`amp_ratio`**: Ratio of the wander amplitude relative to the original signal
-* **`freq_range`**: Frequency range of the wander (default: 0.05Hz - 0.3Hz)
+* **`freq_range`**: Frequency range of the wander (default: 0.05Hz - 0.3Hz
+<img width="1901" height="309" alt="image" src="https://github.com/user-attachments/assets/23cd0d07-7a5c-4918-8566-f2290795b73e" />
+
 
 ### 2. `AddRespirationInterference`
 Simulates the inevitable respiration modulation effects in physiological signals.
