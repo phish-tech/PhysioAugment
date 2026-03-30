@@ -1,5 +1,7 @@
 # PhysioAugment 🫀📈
 
+[English](README.md) | [简体中文](README_zh-CN.md)
+
 **A Lightweight, Plug-and-Play 1D Physiological Signal Augmentation Library for Deep Learning.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
