@@ -1,62 +1,69 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from core import Compose
-from baseline import AddBaselineWander, AddRespirationInterference
+# 引入我们写好的增强算法模块
+from baseline import AddBaselineWander, AddRespirationInterference # <-- 补充导入了呼吸干扰
 from artifacts import AddMotionArtifact
 
 def run_demo():
+    # 1. 加载真实的 PPG 数据
+    print("正在加载 PPG 数据...")
     try:
-        clean_ppg = np.load('test_ppg.npy')[:1000]
+        clean_ppg = np.load('test_ppg.npy')
     except FileNotFoundError:
-        print("错误：找不到 test_ppg.npy 文件！")
+        print("错误：找不到 test_ppg.npy，请确保数据在同级目录下！")
         return
 
-    # 1. 单独的增强器（用于展示分解动作）
-    aug_baseline = AddBaselineWander(fs=100, amp_ratio=0.5, p=1.0)
-    aug_artifact = AddMotionArtifact(fs=100, artifact_ratio=2.0, num_artifacts=(1, 2), p=1.0)
-    
-    # 2. 终极管道 (全家桶)
-    pipeline = Compose([
-        AddBaselineWander(fs=100, amp_ratio=0.4, p=1.0),
-        AddRespirationInterference(fs=100, amp_ratio=0.3, p=1.0),
-        AddMotionArtifact(fs=100, artifact_ratio=1.5, num_artifacts=(1, 2), p=1.0)
-    ])
+    # 截取前 1000 个点用于清晰可视化 (约 10 秒数据)
+    plot_length = min(1000, len(clean_ppg))
+    clean_ppg_segment = clean_ppg[:plot_length]
 
-    # 3. 生成各种信号
-    sig_baseline = aug_baseline(clean_ppg)
-    sig_artifact = aug_artifact(clean_ppg)
-    sig_full = pipeline(clean_ppg)
+    # 2. 实例化增强器 (预留好接口配置)
+    augmenter_bw = AddBaselineWander(fs=100, amp_ratio=0.5, p=1.0)
+    augmenter_ri = AddRespirationInterference(fs=100, amp_ratio=0.2, p=1.0) # <-- 实例化呼吸干扰
+    augmenter_ma = AddMotionArtifact(fs=100, artifact_ratio=1.5, num_artifacts=(1, 2), p=1.0)
 
+    # 3. 分别生成增强后的信号
+    print("正在应用数据增强...")
+    ppg_with_bw = augmenter_bw(clean_ppg_segment)
+    ppg_with_ri = augmenter_ri(clean_ppg_segment) # <-- 生成呼吸干扰信号
+    ppg_with_ma = augmenter_ma(clean_ppg_segment)
 
-    # 3.5 保存增强后的数据到本地
-    print("正在保存增强后的数据...")
-    # 保存为炼丹师最爱的 .npy 格式
-    np.save('augmented_baseline.npy', sig_baseline)
-    np.save('augmented_full_pipeline.npy', sig_full)
-    
-    # 如果你想分享给用传统 MATLAB 跑信号处理的同事，也可以存为 .mat
-    import scipy.io as sio
-    sio.savemat('augmented_full_pipeline.mat', {'sig_full': sig_full})
-    print("保存完毕！请查看左侧目录。")
+    # 4. 统一的绘图接口 (改为 4行1列 对比图)
+    print("正在生成效果对比图...")
+    fig, axes = plt.subplots(4, 1, figsize=(14, 12), sharex=True)
 
-    # ... 下面继续是画图的代码 (fig, axes = plt.subplots...) ...
+    # 第一张图：原始干净信号
+    axes[0].plot(clean_ppg_segment, color='#2ca02c', linewidth=1.5, label='Original Clean PPG')
+    axes[0].set_title("PhysioAugment Demo: Original vs Augmented Signals", fontsize=16, fontweight='bold')
+    axes[0].legend(loc='upper right')
+    axes[0].grid(True, linestyle='--', alpha=0.6)
 
-    # 4. 绘制 4 行对比图
-    fig, axes = plt.subplots(4, 1, figsize=(12, 10), sharex=True)
-    
-    axes[0].plot(clean_ppg, color='#2ca02c', label='1. Original Clean PPG')
-    axes[0].set_title("PhysioAugment: 1D Physiological Signal Augmentation", fontsize=16, fontweight='bold')
-    
-    axes[1].plot(sig_baseline, color='#ff7f0e', label='2. Low Freq: Baseline Wander')
-    axes[2].plot(sig_artifact, color='#9467bd', label='3. High Freq: Motion Artifacts')
-    axes[3].plot(sig_full, color='#d62728', label='4. Compose: Full Pipeline (All combined)')
+    # 第二张图：基线漂移
+    axes[1].plot(ppg_with_bw, color='#ff7f0e', linewidth=1.5, label='Augmented: Baseline Wander (Low Freq)')
+    axes[1].legend(loc='upper right')
+    axes[1].grid(True, linestyle='--', alpha=0.6)
 
-    for ax in axes:
-        ax.legend(loc='upper right')
-        ax.grid(True, linestyle='--', alpha=0.6)
-        
-    axes[3].set_xlabel("Sample Index", fontsize=12)
+    # 第三张图：呼吸干扰 (新增)
+    axes[2].plot(ppg_with_ri, color='#1f77b4', linewidth=1.5, label='Augmented: Respiration Interference (Modulation)')
+    axes[2].legend(loc='upper right')
+    axes[2].grid(True, linestyle='--', alpha=0.6)
+
+    # 第四张图：体动伪影
+    axes[3].plot(ppg_with_ma, color='#d62728', linewidth=1.5, label='Augmented: Motion Artifacts (High Freq/Burst)')
+    axes[3].set_xlabel("Sample Index", fontsize=12) 
+    axes[3].legend(loc='upper right')
+    axes[3].grid(True, linestyle='--', alpha=0.6)
+
+    # --- 微调部分：强制全屏显示 ---
+    try:
+        manager = plt.get_current_fig_manager()
+        manager.window.showMaximized() 
+    except Exception as e:
+        print(f"提示：当前后端不支持自动最大化窗口 ({e})")
+    # ----------------------------
+
+    # 调整布局并显示
     plt.tight_layout()
     plt.show()
 
