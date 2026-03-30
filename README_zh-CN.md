@@ -72,6 +72,8 @@ augmented_x = augment_pipeline(x)
 ### 2. `AddRespirationInterference` (呼吸干扰)
 模拟生理信号中不可避免的呼吸调制效应。
 * **`resp_freq_range`**: 典型呼吸频率范围 (默认 0.2Hz - 0.4Hz)
+<img width="1898" height="232" alt="image" src="https://github.com/user-attachments/assets/a092c0c7-5f91-40ac-82dc-662f40e5c70d" />
+
 
 ### 3. `AddMotionArtifact` (体动伪影)
 模拟由用户剧烈运动产生的突发性、高振幅噪声。
