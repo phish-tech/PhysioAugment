@@ -23,19 +23,24 @@
 
 ```bash
 pip install git+[https://github.com/phish-tech/PhysioAugment.git](https://github.com/phish-tech/PhysioAugment.git)
+```
+
 或者，将代码克隆到本地进行开发（推荐使用可编辑模式）：
 
-Bash
+```bash
 git clone [https://github.com/phish-tech/PhysioAugment.git](https://github.com/phish-tech/PhysioAugment.git)
 cd PhysioAugment
 pip install -e .
-🚀 快速开始
-PhysioAugment 的 API 设计非常直观。你可以使用 Compose 将多个增强操作串联起来：
+```
 
-Python
+## 🚀 快速开始
+
+PhysioAugment 的 API 设计非常直观。你可以使用 `Compose` 将多个增强操作串联起来：
+
+```python
 import numpy as np
-from PhysioAugment.core import Compose, AddMotionArtifact
-from PhysioAugment.baseline import AddBaselineWander, AddRespirationInterference
+from core import Compose, AddMotionArtifact
+from baseline import AddBaselineWander, AddRespirationInterference
 
 # 1. 初始化数据增强流水线
 augment_pipeline = Compose([
@@ -50,29 +55,27 @@ x = np.sin(2 * np.pi * 1.5 * np.arange(1000) / 100) # 模拟信号
 
 # 3. 应用数据增强
 augmented_x = augment_pipeline(x)
-🛠️ 支持的增强方法
+```
+
+## 🛠️ 支持的增强方法
+
 目前版本包含以下核心增强模块（更多模块持续更新中）：
 
-1. AddBaselineWander (基线漂移)
+### 1. `AddBaselineWander` (基线漂移)
 模拟由传感器位移或温度变化引起的低频基线漂移。
+* **`fs`**: 采样率
+* **`amp_ratio`**: 漂移幅度相对于原信号的比例
+* **`freq_range`**: 漂移频率的范围 (默认 0.05Hz - 0.3Hz)
 
-fs: 采样率
-
-amp_ratio: 漂移幅度相对于原信号的比例
-
-freq_range: 漂移频率的范围 (默认 0.05Hz - 0.3Hz)
-
-2. AddRespirationInterference (呼吸干扰)
+### 2. `AddRespirationInterference` (呼吸干扰)
 模拟生理信号中不可避免的呼吸调制效应。
+* **`resp_freq_range`**: 典型呼吸频率范围 (默认 0.2Hz - 0.4Hz)
 
-resp_freq_range: 典型呼吸频率范围 (默认 0.2Hz - 0.4Hz)
-
-3. AddMotionArtifact (体动伪影)
+### 3. `AddMotionArtifact` (体动伪影)
 模拟由用户剧烈运动产生的突发性、高振幅噪声。
+* **`artifact_ratio`**: 伪影强度
+* **`num_artifacts`**: 生成伪影的数量区间
 
-artifact_ratio: 伪影强度
+## 📄 开源协议
 
-num_artifacts: 生成伪影的数量区间
-
-📄 开源协议
-本项目基于 MIT License 协议开源。欢迎在你的研究或项目中免费使用。如果你觉得这个库对你有帮助，欢迎点个 ⭐️ Star！
+本项目基于 [MIT License](LICENSE) 协议开源。欢迎在你的研究或项目中免费使用。如果你觉得这个库对你有帮助，欢迎点个 ⭐️ Star！
