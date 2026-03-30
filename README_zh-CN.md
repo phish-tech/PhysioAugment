@@ -66,7 +66,7 @@ augmented_x = augment_pipeline(x)
 * **`fs`**: 采样率
 * **`amp_ratio`**: 漂移幅度相对于原信号的比例
 * **`freq_range`**: 漂移频率的范围 (默认 0.05Hz - 0.3Hz)
-* <img width="1901" height="309" alt="image" src="https://github.com/user-attachments/assets/a31926a1-b332-46d8-924a-ed4711c149b1" />
+ <img width="1901" height="309" alt="image" src="https://github.com/user-attachments/assets/a31926a1-b332-46d8-924a-ed4711c149b1" />
 
 
 ### 2. `AddRespirationInterference` (呼吸干扰)
@@ -77,6 +77,7 @@ augmented_x = augment_pipeline(x)
 模拟由用户剧烈运动产生的突发性、高振幅噪声。
 * **`artifact_ratio`**: 伪影强度
 * **`num_artifacts`**: 生成伪影的数量区间
+<img width="1913" height="323" alt="image" src="https://github.com/user-attachments/assets/31ef2fd7-f68b-454b-a690-6b5c06c14ef4" />
 
 ## 📄 开源协议
 
